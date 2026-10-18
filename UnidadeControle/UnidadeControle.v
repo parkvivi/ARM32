@@ -8,7 +8,7 @@ input wire Inibe,
 output reg [2:0] CTRLDesvio, CTRLDadoImediato, CTRLEndMem, CTRLDadoReg,
 
 // Saídas :: Sinais de Controle :: Escrita
-output reg CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLSaida, CTRLDadoCPSR, CTRLEscritaInstr, CTRLEscritaHD, CTRLLCD,
+output reg CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLSaida, CTRLDadoCPSR, CTRLEscritaInstr, CTRLEscritaHD, CTRLEscritaBase, CTRLLCD,
 output reg [1:0] CTRLEscritaIR,
 
 // Saídas :: Sinais de Controle :: ULA
@@ -39,7 +39,7 @@ output reg LEDIN, LEDOUT
 	// Parâmetros Auxiliares :: Instruções do Tipo A
 	
 	localparam	HLT = 5'b00001, IN = 5'b00010, OUT = 5'b00011, RCPSR = 5'b00100, WCPSR = 5'b00101,
-					WLCD = 5'b00110,	LDHD = 5'b00111, RIR2 = 5'b01010;
+					WLCD = 5'b00110,	LDHD = 5'b00111, RIR2 = 5'b01010, WB = 5'b01011;
 	
 	always @ (*)
 		begin
@@ -146,6 +146,7 @@ output reg LEDIN, LEDOUT
 							CTRLEscritaInstr	<= 1'b0;
 							CTRLEscritaHD		<= 1'b0;
 							CTRLEscritaIR		<= 2'b00;
+							CTRLEscritaBase	<= 1'b0;
 							CTRLLCD				<= 1'b0;
 							end
 				TipoB:	begin
@@ -188,6 +189,7 @@ output reg LEDIN, LEDOUT
 							CTRLDadoCPSR		<= 3'b000;
 							CTRLEscritaInstr	<= 1'b0;
 							CTRLEscritaHD		<= 1'b0;
+							CTRLEscritaBase	<= 1'b0;
 							CTRLLCD				<= 1'b0;
 							end
 				TipoM:	begin
@@ -213,6 +215,7 @@ output reg LEDIN, LEDOUT
 							CTRLEscritaInstr	<= 1'b0;
 							CTRLEscritaHD		<= 1'b0;
 							CTRLEscritaIR		<= 2'b00;
+							CTRLEscritaBase	<= 1'b0;
 							CTRLLCD				<= 1'b0;
 							end
 				TipoA:	begin
@@ -227,6 +230,7 @@ output reg LEDIN, LEDOUT
 												CTRLDadoCPSR	<= 3'b000;
 												CTRLEscritaInstr	<= 1'b0;
 												CTRLEscritaHD	<= 1'b0;
+												CTRLEscritaBase<= 1'b0;
 												CTRLLCD			<= 1'b0;
 												end
 									IN:		begin
@@ -239,6 +243,7 @@ output reg LEDIN, LEDOUT
 												CTRLDadoCPSR	<= 3'b000;
 												CTRLEscritaInstr	<= 1'b0;
 												CTRLEscritaHD	<= 1'b0;
+												CTRLEscritaBase<= 1'b0;
 												CTRLLCD			<= 1'b0;
 												LEDIN 			<= 1'b1;
 												end
@@ -252,6 +257,7 @@ output reg LEDIN, LEDOUT
 												CTRLDadoCPSR	<= 3'b000;
 												CTRLEscritaInstr	<= 1'b0;
 												CTRLEscritaHD	<= 1'b0;
+												CTRLEscritaBase<= 1'b0;
 												CTRLLCD			<= 1'b0;
 												LEDOUT 			<= 1'b1;
 												end
@@ -265,6 +271,7 @@ output reg LEDIN, LEDOUT
 												CTRLDadoCPSR	<= 3'b000;
 												CTRLEscritaInstr	<= 1'b0;
 												CTRLEscritaHD	<= 1'b0;
+												CTRLEscritaBase<= 1'b0;
 												CTRLLCD			<= 1'b0;
 												end
 									WCPSR:	begin
@@ -277,6 +284,7 @@ output reg LEDIN, LEDOUT
 												CTRLDadoCPSR	<= 3'b001;
 												CTRLEscritaInstr	<= 1'b0;
 												CTRLEscritaHD	<= 1'b0;
+												CTRLEscritaBase<= 1'b0;
 												CTRLLCD			<= 1'b0;
 												end
 									WLCD:		begin
@@ -289,6 +297,7 @@ output reg LEDIN, LEDOUT
 												CTRLDadoCPSR	<= 3'b000;
 												CTRLEscritaInstr	<= 1'b0;
 												CTRLEscritaHD	<= 1'b0;
+												CTRLEscritaBase<= 1'b0;
 												CTRLLCD			<= 1'b1;
 												end
 									LDHD:		begin
@@ -301,6 +310,7 @@ output reg LEDIN, LEDOUT
 												CTRLDadoCPSR	<= 3'b000;
 												CTRLEscritaInstr	<= 1'b1;
 												CTRLEscritaHD	<= 1'b0;
+												CTRLEscritaBase<= 1'b0;
 												CTRLLCD			<= 1'b0;
 												end
 									RIR2:		begin
@@ -313,6 +323,20 @@ output reg LEDIN, LEDOUT
 												CTRLDadoCPSR	<= 3'b000;
 												CTRLEscritaInstr	<= 1'b0;
 												CTRLEscritaHD	<= 1'b0;
+												CTRLEscritaBase<= 1'b0;
+												CTRLLCD			<= 1'b0;
+												end
+									WB:		begin
+												CTRLHalt 		<=	1'b0;
+												CTRLEscritaCPSR<= 1'b0;
+												CTRLEscritaReg <=	1'b0;
+												CTRLDadoReg		<= 3'b010;
+												CTRLSaida		<= 1'b0;
+												CTRLCLK			<= 1'b0;
+												CTRLDadoCPSR	<= 3'b000;
+												CTRLEscritaInstr	<= 1'b0;
+												CTRLEscritaHD	<= 1'b0;
+												CTRLEscritaBase<= 1'b1;
 												CTRLLCD			<= 1'b0;
 												end
 								default:	 	begin
@@ -325,6 +349,7 @@ output reg LEDIN, LEDOUT
 												CTRLDadoCPSR	<= 3'b000;
 												CTRLEscritaInstr	<= 1'b0;
 												CTRLEscritaHD	<= 1'b0;
+												CTRLEscritaBase<= 1'b0;
 												CTRLLCD			<= 1'b0;
 												end
 							endcase
@@ -348,6 +373,7 @@ output reg LEDIN, LEDOUT
 							CTRLDadoImediato 	<=	3'b000;
 							CTRLEscritaReg 	<=	1'b0;
 							CTRLEscritaIR		<= 2'b00;
+							CTRLEscritaBase	<= 1'b0;
 							CTRLSaida			<= 1'b0;
 							CTRLCLK				<= 1'b0;
 							CTRLLCD				<= 1'b0;
@@ -368,6 +394,7 @@ output reg LEDIN, LEDOUT
 			CTRLDadoImediato 	<=	3'b000;
 			CTRLEscritaReg 	<=	1'b0;
 			CTRLEscritaIR		<= 2'b00;
+			CTRLEscritaBase	<= 1'b0;
 			CTRLSaida			<= 1'b0;
 			CTRLCLK				<= 1'b0;
 			CTRLDadoCPSR		<= 3'b000;

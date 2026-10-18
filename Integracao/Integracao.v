@@ -16,7 +16,7 @@ inout wire [7:0] DATA_BUS
 	// Conexões Intermediárias
 	wire [31:0] NovoEndereco, EnderecoAtual, ProximoEndereco, Instrucao, EndSelecionado, Imediato, FlagsNZCVEstendidas;
 	wire [31:0] DadoEntrada, DadoRegLeitura1, DadoRegLeitura2, DadoSelecionado, DadoMemoria, DadoRegEscrita, SaidaULA, DadoCPSREscrita, DadoHD;
-	wire [31:0] DadoLeituraIR0, DadoLeituraIR1, DadoLeituraIR2;
+	wire [31:0] DadoLeituraIR0, DadoLeituraIR1, DadoLeituraIR2, EnderecoBase, EndMD;
 	wire [7:0] Opcode;
 	wire [4:0] RN, RM, RD;
 	wire [3:0] Cond, NovasFlags, FlagsNZCV;
@@ -26,7 +26,7 @@ inout wire [7:0] DATA_BUS
 	wire [3:0] CTRLOpULA;
 	wire [2:0] CTRLDesvio, CTRLDadoImediato, CTRLEndMem, CTRLDadoReg, CTRLDadoCPSR;
 	wire [1:0] CTRLEscritaIR;
-	wire CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLEscritaInstr, CTRLEscritaHD;
+	wire CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLEscritaInstr, CTRLEscritaHD, CTRLEscritaBase;
 	wire CTRLHalt, CTRLSaida, CTRLCLK, CTRLLCD;
 	
 	// Conexões Intermediárias: Clock
@@ -134,8 +134,8 @@ inout wire [7:0] DATA_BUS
 					.DadoSaida(EndSelecionado)
 					);
 				
-	MemPrincipal MemPrincipal	(	.EndLeitura(EndSelecionado),
-											.EndEscrita(EndSelecionado),
+	MemPrincipal MemPrincipal	(	.EndLeitura(EndMD),
+											.EndEscrita(EndMD),
 											.DadoMemEscrita(DadoRegLeitura2),
 											.CTRLEscritaMem(CTRLEscritaMem),
 											.CLK(CLK),
@@ -177,6 +177,7 @@ inout wire [7:0] DATA_BUS
 													.CTRLEscritaInstr(CTRLEscritaInstr),
 													.CTRLEscritaHD(CTRLEscritaHD),
 													.CTRLEscritaIR(CTRLEscritaIR),
+													.CTRLEscritaBase(CTRLEscritaBase),
 													.CTRLLCD(CTRLLCD),
 													.LEDIN(LEDIN),
 													.LEDOUT(LEDOUT)
@@ -228,6 +229,17 @@ inout wire [7:0] DATA_BUS
 																.DadoLeituraIR1(DadoLeituraIR1),
 																.DadoLeituraIR2(DadoLeituraIR2),
 															);
+	
+	Base Base ( .NovaBase(DadoRegLeitura1),
+					.CTRLEscritaBase(CTRLEscritaBase),
+					.CLK(CLK),
+					.EnderecoBase(EnderecoBase)
+					);
+	
+	Adder ADD2 (	.Dado1(EnderecoBase),
+						.Dado2(EndSelecionado),
+						.Soma(EndMD)
+					);
 	
 	//LCD LCD (	.CLKFPGA(CLKFPGA),
 	//				.ChaveReset(ChaveReset),
