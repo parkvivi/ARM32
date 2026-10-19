@@ -3,5 +3,6 @@
 **/output_files/
 **/simulation/
 
+*.qws
 *.v.bak
 *.vwf

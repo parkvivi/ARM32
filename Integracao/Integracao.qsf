@@ -113,7 +113,7 @@ set_global_assignment -name VERILOG_FILE ../BancoRegistradores/BancoRegistradore
 set_global_assignment -name VERILOG_FILE Integracao.v
 set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform.vwf
 set_location_assignment PIN_M23 -to ChaveClock
-set_location_assignment PIN_Y24 -to ChaveReset
+set_location_assignment PIN_Y23 -to ChaveReset
 set_location_assignment PIN_AB28 -to ChaveDado[0]
 set_location_assignment PIN_AC28 -to ChaveDado[1]
 set_location_assignment PIN_AC27 -to ChaveDado[2]
