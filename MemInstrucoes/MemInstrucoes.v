@@ -13,7 +13,7 @@ module MemInstrucoes
 );
 
 	// Variáveis Auxiliares :: Memória RAM
-	reg [31:0] instr_ram[255:0];
+	reg [31:0] instr_ram[1023:0];
 
 	initial
 		begin
