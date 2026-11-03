@@ -5,10 +5,10 @@ input wire [7:0] Opcode,
 input wire Inibe,
 
 // Saídas :: Sinais de Controle :: MUX
-output reg [2:0] CTRLDesvio, CTRLDadoImediato, CTRLEndMem, CTRLDadoReg,
+output reg [2:0] CTRLDesvio, CTRLDadoImediato, CTRLEndMem, CTRLDadoReg, CTRLDadoCPSR,
 
 // Saídas :: Sinais de Controle :: Escrita
-output reg CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLSaida, CTRLDadoCPSR, CTRLEscritaInstr, CTRLEscritaHD, CTRLEscritaBase, CTRLLCD,
+output reg CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLSaida, CTRLEscritaInstr, CTRLEscritaHD, CTRLEscritaBase, CTRLLCD,
 output reg [1:0] CTRLEscritaIR,
 
 // Saídas :: Sinais de Controle :: ULA
@@ -167,7 +167,7 @@ output reg LEDIN, LEDOUT
 											CTRLEscritaIR	<= 2'b00;
 											end
 								BUP:		begin
-											CTRLDesvio 		<= 3'b001;
+											CTRLDesvio 		<= 3'b010;
 											CTRLEscritaReg <=	1'b0;
 											CTRLEscritaIR	<= 2'b11;
 											end
