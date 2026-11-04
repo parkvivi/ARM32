@@ -1,0 +1,129 @@
+# Placa FPGA Altera DE2-115, EP4CE115F29C7
+# Lab Remoto - Botões e Switches são GPIO
+
+# ChaveDado[8],PIN_AF15
+# ChaveDado[9],PIN_AF24
+# ChaveDado[10],PIN_AE21
+# ChaveDado[11],PIN_AF25
+# ChaveDado[12],PIN_AC22
+# ChaveDado[13],PIN_AE22
+# ChaveDado[14],PIN_AF21
+# ChaveDado[15],PIN_AF22
+# ChaveDado[16],PIN_AD22
+
+# KEY[1],PIN_AC15
+# KEY[2],PIN_AB21
+# KEY[3],PIN_Y17
+
+# LEDR[0],PIN_G19
+# LEDR[1],PIN_F19
+# LEDR[2],PIN_E19
+# LEDR[3],PIN_F21
+# LEDR[4],PIN_F18
+# LEDR[5],PIN_E18
+# LEDR[6],PIN_J19
+# LEDR[7],PIN_H19
+# LEDR[8],PIN_J17
+# LEDR[9],PIN_G17
+# LEDR[10],PIN_J15
+# LEDR[11],PIN_H16
+# LEDR[12],PIN_J16
+# LEDR[13],PIN_H17
+# LEDR[14],PIN_F15
+# LEDR[15],PIN_G15
+# LEDR[16],PIN_G16
+# LEDR[17],PIN_H15
+
+# LEDG[0],PIN_E21
+# LEDG[1],PIN_E22
+# LEDG[2],PIN_E25
+# LEDG[3],PIN_E24
+# LEDG[4],PIN_H21
+# LEDG[5],PIN_G20
+# LEDG[6],PIN_G22
+# LEDG[7],PIN_G21
+# LEDG[8],PIN_F17
+
+To,Location
+ChaveDado[0],PIN_Y16
+ChaveDado[1],PIN_AD21
+ChaveDado[2],PIN_AE16
+ChaveDado[3],PIN_AD15
+ChaveDado[4],PIN_AE15
+ChaveDado[5],PIN_AC19
+ChaveDado[6],PIN_AF16
+ChaveDado[7],PIN_AD19
+ChaveReset,PIN_AG25
+ChaveClock,PIN_AB22
+Segmentos[0],PIN_G18
+Segmentos[1],PIN_F22
+Segmentos[2],PIN_E17
+Segmentos[3],PIN_L26
+Segmentos[4],PIN_L25
+Segmentos[5],PIN_J22
+Segmentos[6],PIN_H22
+Segmentos[7],PIN_M24
+Segmentos[8],PIN_Y22
+Segmentos[9],PIN_W21
+Segmentos[10],PIN_W22
+Segmentos[11],PIN_W25
+Segmentos[12],PIN_U23
+Segmentos[13],PIN_U24
+Segmentos[14],PIN_AA25
+Segmentos[15],PIN_AA26
+Segmentos[16],PIN_Y25
+Segmentos[17],PIN_W26
+Segmentos[18],PIN_Y26
+Segmentos[19],PIN_W27
+Segmentos[20],PIN_W28
+Segmentos[21],PIN_V21
+Segmentos[22],PIN_U21
+Segmentos[23],PIN_AB20
+Segmentos[24],PIN_AA21
+Segmentos[25],PIN_AD24
+Segmentos[26],PIN_AF23
+Segmentos[27],PIN_Y19
+SegmentosEntrada[0],PIN_AB19
+SegmentosEntrada[1],PIN_AA19
+SegmentosEntrada[2],PIN_AG21
+SegmentosEntrada[3],PIN_AH21
+SegmentosEntrada[4],PIN_AE19
+SegmentosEntrada[5],PIN_AF19
+SegmentosEntrada[6],PIN_AE18
+SegmentosEntrada[7],PIN_AD18
+SegmentosEntrada[8],PIN_AC18
+SegmentosEntrada[9],PIN_AB18
+SegmentosEntrada[10],PIN_AH19
+SegmentosEntrada[11],PIN_AG19
+SegmentosEntrada[12],PIN_AF18
+SegmentosEntrada[13],PIN_AH18
+SegmentosEntrada[14],PIN_AA17
+SegmentosEntrada[15],PIN_AB16
+SegmentosEntrada[16],PIN_AA16
+SegmentosEntrada[17],PIN_AB17
+SegmentosEntrada[18],PIN_AB15
+SegmentosEntrada[19],PIN_AA15
+SegmentosEntrada[20],PIN_AC17
+SegmentosEntrada[21],PIN_AD17
+SegmentosEntrada[22],PIN_AE17
+SegmentosEntrada[23],PIN_AG17
+SegmentosEntrada[24],PIN_AH17
+SegmentosEntrada[25],PIN_AF17
+SegmentosEntrada[26],PIN_AG18
+SegmentosEntrada[27],PIN_AA14
+LEDIN,PIN_G19
+LEDOUT,PIN_G21
+CLOCK_50,PIN_Y2
+LCD_RW,PIN_M1
+LCD_EN,PIN_L4
+LCD_RS,PIN_M2
+LCD_DATA[0],PIN_L3
+LCD_DATA[1],PIN_L1
+LCD_DATA[2],PIN_L2
+LCD_DATA[3],PIN_K7
+LCD_DATA[4],PIN_K1
+LCD_DATA[5],PIN_K2
+LCD_DATA[6],PIN_M3
+LCD_DATA[7],PIN_M5
+LCD_ON,PIN_L5
+LCD_BLON,PIN_L6

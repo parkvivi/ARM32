@@ -9,8 +9,8 @@ output wire [27:0] Segmentos, SegmentosEntrada,
 output wire LEDIN, LEDOUT,
 
 // Saídas :: LCD
-output wire LCD_RS, LCD_E, LCD_RW,
-inout wire [7:0] DATA_BUS
+output wire LCD_RS, LCD_EN, LCD_RW, LCD_ON, LCD_BLON,
+inout wire [7:0] LCD_DATA
 );
 
 	// Conexões Intermediárias
@@ -26,8 +26,8 @@ inout wire [7:0] DATA_BUS
 	wire [3:0] CTRLOpULA;
 	wire [2:0] CTRLDesvio, CTRLDadoImediato, CTRLEndMem, CTRLDadoReg, CTRLDadoCPSR;
 	wire [1:0] CTRLEscritaIR;
-	wire CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLEscritaInstr, CTRLEscritaHD, CTRLEscritaBase;
-	wire CTRLHalt, CTRLSaida, CTRLCLK, CTRLLCD;
+	wire CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLEscritaInstr, CTRLEscritaHD, CTRLEscritaBase, CTRLEscritaLCD;
+	wire CTRLHalt, CTRLSaida, CTRLCLK;
 	
 	// Conexões Intermediárias: Clock
 	wire CLK, CLKManual;
@@ -178,7 +178,7 @@ inout wire [7:0] DATA_BUS
 													.CTRLEscritaHD(CTRLEscritaHD),
 													.CTRLEscritaIR(CTRLEscritaIR),
 													.CTRLEscritaBase(CTRLEscritaBase),
-													.CTRLLCD(CTRLLCD),
+													.CTRLEscritaLCD(CTRLEscritaLCD),
 													.LEDIN(LEDIN),
 													.LEDOUT(LEDOUT)
 													);
@@ -227,7 +227,7 @@ inout wire [7:0] DATA_BUS
 																.CLK(CLK),
 																.DadoLeituraIR0(DadoLeituraIR0),
 																.DadoLeituraIR1(DadoLeituraIR1),
-																.DadoLeituraIR2(DadoLeituraIR2),
+																.DadoLeituraIR2(DadoLeituraIR2)
 															);
 	
 	Base Base ( .NovaBase(DadoRegLeitura1),
@@ -240,16 +240,18 @@ inout wire [7:0] DATA_BUS
 						.Dado2(EndSelecionado),
 						.Soma(EndMD)
 					);
-	
-	//LCD LCD (	.CLKFPGA(CLKFPGA),
-	//				.ChaveReset(ChaveReset),
-	//				.CTRLLCD(CTRLLCD),
-	//				.EnderecoLCD(Imediato),
-	//				.DadoLCD(DadoRegLeitura1),
-	//				.LCD_RS(LCD_RS),
-	//				.LCD_E(LCD_E),
-	//				.LCD_RW(LCD_RW),
-	//				.DATA_BUS(DATA_BUS)
-	//			);
+					
+	LCD LCD (	.CLOCK_50(CLKFPGA),
+					.write_clock(CLK),
+					.write_lcd(CTRLEscritaLCD),
+					.lcd_addr(Imediato),
+					.lcd_data(DadoRegLeitura1),
+					.LCD_ON(LCD_ON),
+					.LCD_BLON(LCD_BLON),
+					.LCD_RW(LCD_RW),
+					.LCD_EN(LCD_EN),
+					.LCD_RS(LCD_RS),
+					.LCD_DATA(LCD_DATA)
+	);
 
 endmodule 

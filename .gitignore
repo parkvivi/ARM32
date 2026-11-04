@@ -4,5 +4,5 @@
 **/simulation/
 
 *.qws
-*.v.bak
+**.bak
 *.vwf
