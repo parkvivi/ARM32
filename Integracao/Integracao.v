@@ -16,29 +16,31 @@ inout wire [7:0] LCD_DATA
 	// Conexões Intermediárias
 	wire [31:0] NovoEndereco, EnderecoAtual, ProximoEndereco, Instrucao, EndSelecionado, Imediato, FlagsNZCVEstendidas;
 	wire [31:0] DadoEntrada, DadoRegLeitura1, DadoRegLeitura2, DadoSelecionado, DadoMemoria, DadoRegEscrita, SaidaULA, DadoCPSREscrita, DadoHD;
-	wire [31:0] DadoLeituraIR0, DadoLeituraIR1, DadoLeituraIR2, EnderecoBase, EndMD;
+	wire [31:0] DadoLeituraIR0, DadoLeituraIR1, DadoLeituraIR2, DadoLeituraIR3, EnderecoBase, EndMD;
 	wire [7:0] Opcode;
 	wire [4:0] RN, RM, RD;
 	wire [3:0] Cond, NovasFlags, FlagsNZCV;
-	wire Inibe;
+	wire Inibe, Interrupcao;
 	
 	// Conexões Intermediárias: Sinais de Controle
 	wire [3:0] CTRLOpULA;
 	wire [2:0] CTRLDesvio, CTRLDadoImediato, CTRLEndMem, CTRLDadoReg, CTRLDadoCPSR;
 	wire [1:0] CTRLEscritaIR;
-	wire CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLEscritaInstr, CTRLEscritaHD, CTRLEscritaBase, CTRLEscritaLCD;
+	wire CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLEscritaInstr, CTRLEscritaHD, CTRLEscritaBase, CTRLEscritaLCD, CTRLQuantum;
 	wire CTRLHalt, CTRLSaida, CTRLCLK;
 	
 	// Conexões Intermediárias: Clock
 	wire CLK, CLKManual;
 
 	localparam Zero = 32'b0, Um = 32'b00000000000000000000000000000001;
-		
+	
 	PC PC	(	.CTRLHalt(CTRLHalt),
 				.CLK(CLK),
 				.Reset(ChaveReset),
 				.NovoEndereco(NovoEndereco),
-				.EnderecoAtual(EnderecoAtual)
+				.EnderecoAtual(EnderecoAtual),
+				.EnderecoInterrupcao(DadoLeituraIR2),
+				.Interrupcao(Interrupcao)
 				);
 			
 	Adder ADD	(	.Dado1(EnderecoAtual),
@@ -162,6 +164,8 @@ inout wire [7:0] LCD_DATA
 	
 	UnidadeControle UnidadeControle	(	.Opcode(Opcode),
 													.Inibe(Inibe),
+													.Interrupcao(Interrupcao),
+													.CLK(CLK),
 													.CTRLDesvio(CTRLDesvio),
 													.CTRLDadoImediato(CTRLDadoImediato),
 													.CTRLEndMem(CTRLEndMem),
@@ -179,6 +183,7 @@ inout wire [7:0] LCD_DATA
 													.CTRLEscritaIR(CTRLEscritaIR),
 													.CTRLEscritaBase(CTRLEscritaBase),
 													.CTRLEscritaLCD(CTRLEscritaLCD),
+													.CTRLQuantum(CTRLQuantum),
 													.LEDIN(LEDIN),
 													.LEDOUT(LEDOUT)
 													);
@@ -219,15 +224,17 @@ inout wire [7:0] LCD_DATA
 										.DadoHD(DadoHD)
 									);
 	
-	BancoRegInterrupcoes BancoRegInterrupcoes (	.DadoEscritaIR0(Imediato),
-																.DadoEscritaIR1(NovoEndereco),
+	BancoRegInterrupcoes BancoRegInterrupcoes (	.DadoEscritaIR1(NovoEndereco),
 																.DadoEscritaIR2(ProximoEndereco),
 																.CTRLEscritaIR(CTRLEscritaIR),
 																.CLKFPGA(CLKFPGA),
 																.CLK(CLK),
+																.Interrupcao(Interrupcao),
+																.Reset(ChaveReset),
 																.DadoLeituraIR0(DadoLeituraIR0),
 																.DadoLeituraIR1(DadoLeituraIR1),
-																.DadoLeituraIR2(DadoLeituraIR2)
+																.DadoLeituraIR2(DadoLeituraIR2),
+																.DadoLeituraIR3(DadoLeituraIR3)
 															);
 	
 	Base Base ( .NovaBase(DadoRegLeitura1),
@@ -253,5 +260,13 @@ inout wire [7:0] LCD_DATA
 					.LCD_RS(LCD_RS),
 					.LCD_DATA(LCD_DATA)
 	);
+	
+	Temporizador Temporizador (	.clock_processador(CLK),
+											.reset(ChaveReset),
+											.escreve_quantum(CTRLQuantum),
+											.habilita_interrupcao(DadoLeituraIR3),
+											.novo_quantum(DadoRegLeitura1),
+											.interrupcao(Interrupcao)
+										);
 
 endmodule 
