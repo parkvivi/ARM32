@@ -356,7 +356,7 @@ output reg LEDIN, LEDOUT
 												CTRLDadoCPSR		<= 3'b000;
 												CTRLEscritaInstr	<= 1'b0;
 												CTRLEscritaHD		<= 1'b0;
-												CTRLEscritaIR		<= 2'b00;
+												CTRLEscritaIR		<= 2'b11;
 												CTRLEscritaBase 	<= 1'b0;
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b0;

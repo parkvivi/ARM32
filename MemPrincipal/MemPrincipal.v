@@ -13,7 +13,7 @@ module MemPrincipal
 );
 	
 	// Variáveis Auxiliares :: Memória
-	reg [31:0] ram[1023:0];
+	reg [31:0] ram[2047:0];
 	
 	always @ (posedge CLKFPGA)
 		begin

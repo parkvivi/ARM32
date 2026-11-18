@@ -37,7 +37,14 @@ output reg [31:0] Imediato
 				Cond 		= Instrucao[31:28];
 				Opcode 	= {Instrucao[27:24], 4'b0};
 				RN			= Instrucao[23:19];
-				RD			= LR;
+				if (Instrucao[25:24] == 2'b10)	// BL
+					begin
+					RD = LR;
+					end
+				else
+					begin
+					RD = RegVazio;
+					end
 				RM			= RegVazio;
 				Imediato	= {13'b0, Instrucao[18:0]};
 				end

@@ -48,6 +48,9 @@ module BancoRegInterrupcoes
 					2'b10:	begin
 								DadoIR3 <= 32'd1;
 								end
+					2'b11:	begin
+								DadoIR3 <= 32'd0;
+								end
 					default:	begin end
 				endcase
 				end
