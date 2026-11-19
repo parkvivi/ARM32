@@ -8,13 +8,15 @@ input wire CLKFPGA, ChaveClock, ChaveReset,
 output wire [27:0] Segmentos, SegmentosEntrada,
 output wire LEDIN, LEDOUT,
 
+output wire [2:0] CTRLInstrucao,
+
 // Saídas :: LCD
 output wire LCD_RS, LCD_EN, LCD_RW, LCD_ON, LCD_BLON,
 inout wire [7:0] LCD_DATA
 );
 
 	// Conexões Intermediárias
-	wire [31:0] NovoEndereco, EnderecoAtual, ProximoEndereco, Instrucao, EndSelecionado, Imediato, FlagsNZCVEstendidas;
+	wire [31:0] NovoEndereco, EnderecoAtual, ProximoEndereco, Instrucao, InstrMem, InstrBIOS, EndSelecionado, Imediato, FlagsNZCVEstendidas;
 	wire [31:0] DadoEntrada, DadoRegLeitura1, DadoRegLeitura2, DadoSelecionado, DadoMemoria, DadoRegEscrita, SaidaULA, DadoCPSREscrita, DadoHD;
 	wire [31:0] DadoLeituraIR0, DadoLeituraIR1, DadoLeituraIR2, DadoLeituraIR3, EnderecoBase, EndMD;
 	wire [7:0] Opcode;
@@ -32,7 +34,7 @@ inout wire [7:0] LCD_DATA
 	// Conexões Intermediárias: Clock
 	wire CLK, CLKManual;
 
-	localparam Zero = 32'b0, Um = 32'b00000000000000000000000000000001;
+	localparam Zero = 32'd0, Um = 32'd1;
 	
 	PC PC	(	.CTRLHalt(CTRLHalt),
 				.CLK(CLK),
@@ -66,8 +68,25 @@ inout wire [7:0] LCD_DATA
 												.CTRLEscritaInstr(CTRLEscritaInstr),
 												.CLK(CLK),
 												.CLKFPGA(CLKFPGA), 
-												.Instrucao(Instrucao)
-												);			
+												.Instrucao(InstrMem)
+												);	
+	
+	BIOS BIOS (	.clock_leitura(CLKFPGA),
+					.endereco(EnderecoAtual),
+					.instrucao(InstrBIOS)
+					);
+					
+	MUX MUX6 (	.Dado1(InstrBIOS),
+					.Dado2(InstrMem),
+					.Dado3(Zero),
+					.Dado4(Zero),
+					.Dado5(Zero),
+					.Dado6(Zero),
+					.Dado7(Zero),
+					.Dado8(Zero),
+					.Selecao(CTRLInstrucao),
+					.DadoSaida(Instrucao)
+					);
 												
 	UnidadeDecodificacao UnidadeDecodificacao	(	.Instrucao(Instrucao),
 																.Cond(Cond),
@@ -164,7 +183,7 @@ inout wire [7:0] LCD_DATA
 	
 	UnidadeControle UnidadeControle	(	.Opcode(Opcode),
 													.Inibe(Inibe),
-													.Interrupcao(Interrupcao),
+													.ChaveReset(ChaveReset),
 													.CLK(CLK),
 													.CTRLDesvio(CTRLDesvio),
 													.CTRLDadoImediato(CTRLDadoImediato),
@@ -184,6 +203,7 @@ inout wire [7:0] LCD_DATA
 													.CTRLEscritaBase(CTRLEscritaBase),
 													.CTRLEscritaLCD(CTRLEscritaLCD),
 													.CTRLQuantum(CTRLQuantum),
+													.CTRLInstrucao(CTRLInstrucao),
 													.LEDIN(LEDIN),
 													.LEDOUT(LEDOUT)
 													);
