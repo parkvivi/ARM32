@@ -14,8 +14,8 @@ output reg CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLSaida, CTRLEscri
 // Saídas :: Sinais de Controle :: ULA
 output reg [3:0] CTRLOpULA,
 
-// Saídas :: Sinais de Controle :: Halt & Clock
-output reg CTRLHalt, CTRLCLK,
+// Saídas :: Sinais de Controle :: Halt, Clock & Entrada
+output reg CTRLHalt, CTRLCLK, CTRLEntrada,
 
 // Saídas :: LEDs Instruções IN/OUT
 output reg LEDIN, LEDOUT
@@ -40,7 +40,7 @@ output reg LEDIN, LEDOUT
 	
 	localparam	HLT  = 5'b00001, IN   = 5'b00010, OUT  = 5'b00011, RCPSR = 5'b00100, WCPSR = 5'b00101,
 					WLCD = 5'b00110, LDHD = 5'b00111, RIR0 = 5'b01000, RIR1  = 5'b01001, RIR2  = 5'b01010,
-					WB   = 5'b01011, QTM  = 5'b01100, SWB	= 7'b1101101;
+					WB   = 5'b01011, QTM  = 5'b01100, INT  = 5'b01110, SWB	= 7'b1101101;
 	
 	initial
 		begin
@@ -171,6 +171,7 @@ output reg LEDIN, LEDOUT
 							CTRLEscritaBase	<= 1'b0;
 							CTRLEscritaLCD		<= 1'b0;
 							CTRLQuantum			<= 1'b0;
+							CTRLEntrada			<= 1'b0;
 							end
 				TipoB:	begin
 							case (Opcode[5:4])
@@ -215,6 +216,7 @@ output reg LEDIN, LEDOUT
 							CTRLEscritaBase	<= 1'b0;
 							CTRLEscritaLCD		<= 1'b0;
 							CTRLQuantum			<= 1'b0;
+							CTRLEntrada			<= 1'b0;
 							end
 				TipoM:	begin
 							if (Opcode[4:3] == LDRImediato)
@@ -242,6 +244,7 @@ output reg LEDIN, LEDOUT
 							CTRLEscritaBase	<= 1'b0;
 							CTRLEscritaLCD		<= 1'b0;
 							CTRLQuantum			<= 1'b0;
+							CTRLEntrada			<= 1'b0;
 							end
 				TipoA:	begin
 							case (Opcode[5:1])
@@ -260,6 +263,7 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
 												end
 									IN:		begin
 												CTRLHalt 			<= 1'b0;
@@ -276,6 +280,7 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
 												LEDIN 				<= 1'b1;
 												end
 									OUT:		begin
@@ -293,6 +298,7 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
 												LEDOUT 				<= 1'b1;
 												end
 									RCPSR:	begin
@@ -310,6 +316,7 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
 												end
 									WCPSR:	begin
 												CTRLHalt 			<= 1'b0;
@@ -326,6 +333,7 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
 												end
 									WLCD:		begin
 												CTRLHalt 			<= 1'b0;
@@ -342,6 +350,7 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b1;
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
 												end
 									LDHD:		begin
 												CTRLHalt 			<= 1'b0;
@@ -358,6 +367,7 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
 												end
 									RIR0:		begin
 												CTRLHalt 			<= 1'b0;
@@ -374,6 +384,7 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
 												end
 									RIR1:		begin
 												CTRLHalt 			<= 1'b0;
@@ -390,6 +401,7 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
 												end
 									RIR2:		begin
 												CTRLHalt 			<= 1'b0;
@@ -406,6 +418,7 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
 												end
 									WB:		begin
 												CTRLHalt 			<= 1'b0;
@@ -422,6 +435,7 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
 												end
 									QTM:		begin
 												CTRLHalt 			<= 1'b0;
@@ -438,6 +452,25 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b1;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
+												end
+									INT:		begin
+												CTRLHalt 			<= 1'b0;
+												CTRLEscritaCPSR 	<= 1'b0;
+												CTRLEscritaReg  	<= 1'b1;
+												CTRLDadoReg			<= 3'b010;
+												CTRLSaida			<= 1'b0;
+												CTRLCLK				<= 1'b1;
+												CTRLDadoCPSR		<= 3'b000;
+												CTRLEscritaInstr	<= 1'b0;
+												CTRLEscritaHD		<= 1'b0;
+												CTRLEscritaIR		<= 2'b00;
+												CTRLEscritaBase	<= 1'b0;
+												CTRLEscritaLCD		<= 1'b0;
+												CTRLQuantum			<= 1'b0;
+												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b1;
+												LEDIN 				<= 1'b1;
 												end
 								default:	 	begin		// NOP e SWB
 												CTRLHalt 			<= 1'b0;
@@ -454,6 +487,7 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
+												CTRLEntrada			<= 1'b0;
 												end
 							endcase
 							CTRLEscritaMem		<= 1'b0;
@@ -479,6 +513,7 @@ output reg LEDIN, LEDOUT
 							CTRLCLK				<= 1'b0;
 							CTRLEscritaLCD		<= 1'b0;
 							CTRLQuantum			<= 1'b0;
+							CTRLEntrada			<= 1'b0;
 							end
 			endcase
 			end
@@ -502,6 +537,7 @@ output reg LEDIN, LEDOUT
 			CTRLDadoCPSR		<= 3'b000;
 			CTRLEscritaLCD		<= 1'b0;
 			CTRLQuantum			<= 1'b0;
+			CTRLEntrada			<= 1'b0;
 			end
 		end
 
