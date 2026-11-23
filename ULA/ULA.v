@@ -19,7 +19,8 @@ output wire [3:0] NovasFlags
 	
 	// Parâmetros :: CTRLOpULA
 	localparam 	Soma = 4'b0000, Sub1 = 4'b0001, Sub2 = 4'b0010, Mul  = 4'b0011,
-					Div  = 4'b0100, Not = 4'b0101, And  = 4'b0110, Or   = 4'b0111, Xor  = 4'b1000;
+					Div  = 4'b0100, Not = 4'b0101, And  = 4'b0110, Or   = 4'b0111,
+					Xor  = 4'b1000, Lui = 4'b1001;
 	
 	// Operações da ULA					
 	always @ (CTRLOpULA or Dado1 or Dado2)
@@ -50,6 +51,7 @@ output wire [3:0] NovasFlags
 			And: 	SaidaAuxiliar = Dado1 & Dado2;
 			Or: 	SaidaAuxiliar = Dado1 | Dado2;
 			Xor: 	SaidaAuxiliar = Dado1 ^ Dado2;
+			Lui:	SaidaAuxiliar = {Dado2[15:0], 16'd0};
 			default: SaidaAuxiliar = Zero;
 		endcase
 		end

@@ -28,7 +28,7 @@ output reg LEDIN, LEDOUT
 	localparam	ADD = 5'b00000, ADDS = 5'b00001, SUB  = 5'b00010, SUBS = 5'b00011, 
 					RSB = 5'b00100, MUL  = 5'b00101, UDIV = 5'b00110, NOT  = 5'b00111, 
 					AND = 5'b01000, ORR  = 5'b01001, EOR  = 5'b01010, MOV  = 5'b01011, 
-					CMP = 5'b01100;
+					CMP = 5'b01100, MOVT = 5'b01101;
 	
 	// Parâmetros Auxiliares :: Instruções do Tipo B
 	localparam	B = 2'b00, BX = 2'b01, BL = 2'b10, BUP = 2'b11;
@@ -40,7 +40,7 @@ output reg LEDIN, LEDOUT
 	
 	localparam	HLT  = 5'b00001, IN   = 5'b00010, OUT  = 5'b00011, RCPSR = 5'b00100, WCPSR = 5'b00101,
 					WLCD = 5'b00110, LDHD = 5'b00111, RIR0 = 5'b01000, RIR1  = 5'b01001, RIR2  = 5'b01010,
-					WB   = 5'b01011, QTM  = 5'b01100, SWB	= 7'b1101101;
+					WB   = 5'b01011, QTM  = 5'b01100, SWB	= 7'b1101101, STHD = 5'b01110;
 	
 	initial
 		begin
@@ -149,6 +149,12 @@ output reg LEDIN, LEDOUT
 											CTRLEscritaCPSR	<= 1'b1;
 											CTRLOpULA 			<= 4'b0001;
 											CTRLEscritaReg 	<= 1'b0;
+											end
+								MOVT:		begin
+											CTRLDadoReg 		<= 3'b001;
+											CTRLEscritaCPSR	<= 1'b0;
+											CTRLOpULA 			<= 4'b1001;
+											CTRLEscritaReg 	<= 1'b1;
 											end
 								default:	begin
 											CTRLDadoReg 		<= 3'b000;
@@ -437,6 +443,22 @@ output reg LEDIN, LEDOUT
 												CTRLEscritaBase	<= 1'b0;
 												CTRLEscritaLCD		<= 1'b0;
 												CTRLQuantum			<= 1'b1;
+												CTRLDesvio 			<= 3'b000;
+												end
+									STHD:		begin
+												CTRLHalt 			<= 1'b0;
+												CTRLEscritaCPSR	<= 1'b0;
+												CTRLEscritaReg		<= 1'b0;
+												CTRLDadoReg			<= 3'b000;
+												CTRLSaida			<= 1'b0;
+												CTRLCLK				<= 1'b0;
+												CTRLDadoCPSR		<= 3'b000;
+												CTRLEscritaInstr	<= 1'b0;
+												CTRLEscritaHD		<= 1'b1;
+												CTRLEscritaIR		<= 2'b00;
+												CTRLEscritaBase	<= 1'b0;
+												CTRLEscritaLCD		<= 1'b0;
+												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
 												end
 								default:	 	begin		// NOP e SWB
