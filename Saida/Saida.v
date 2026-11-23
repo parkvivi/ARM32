@@ -7,10 +7,10 @@ input wire [31:0] DadoEntrada,
 input wire CTRLSaida,
 
 // Saídas :: LEDs dos Displays de 7 Segmentos
-output wire [55:0] Segmentos
+output wire [27:0] Segmentos
 );
 	
-	wire [7:0] DezenaMilhaoBCD, MilhaoBCD, CentenaMilharBCD, DezenaMilharBCD, MilharBCD, CentenaBCD, DezenaBCD, UnidadeBCD;
+	wire [3:0] MilharBCD, CentenaBCD, DezenaBCD, UnidadeBCD;
 	reg [31:0] DadoSaida;
 	
 	initial
@@ -31,37 +31,13 @@ output wire [55:0] Segmentos
 		end
 	
 	BinarioBCD BinarioBCD	(
-									.Dado(DadoSaida[26:0]),
-									.DezenaMilhao(DezenaMilhaoBCD),
-									.Milhao(MilhaoBCD),
-									.CentenaMilhar(CentenaMilharBCD),
-									.DezenaMilhar(DezenaMilharBCD),
+									.Dado(DadoSaida[13:0]),
 									.Milhar(MilharBCD),
 									.Centena(CentenaBCD),
 									.Dezena(DezenaBCD),
 									.Unidade(UnidadeBCD)
 									);
 	
-	BCD7Seg DezenaMilhao	(
-							.BCD(DezenaMilhaoBCD),
-							.Segmentos(Segmentos[55:49])
-							);
-							
-	BCD7Seg Milhao	(
-							.BCD(MilhaoBCD),
-							.Segmentos(Segmentos[48:42])
-							);
-							
-	BCD7Seg CentenaMilhar (
-							.BCD(CentenaMilharBCD),
-							.Segmentos(Segmentos[41:35])
-							);
-							
-	BCD7Seg DezenaMilhar	(
-							.BCD(DezenaMilharBCD),
-							.Segmentos(Segmentos[34:28])
-							);
-							
 	BCD7Seg Milhar		(
 							.BCD(MilharBCD),
 							.Segmentos(Segmentos[27:21])

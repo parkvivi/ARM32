@@ -1,13 +1,14 @@
 module Integracao
 (
 // Entradas
-input wire [15:0] ChaveDado,
+input wire [7:0] ChaveDado,
 input wire CLKFPGA, ChaveClock, ChaveReset,
 
 // Saídas
-output wire [55:0] Segmentos,
+output wire [27:0] Segmentos, SegmentosEntrada,
 output wire LEDIN, LEDOUT,
-output wire [15:0] LEDR,
+
+output wire [2:0] CTRLInstrucao,
 
 // Saídas :: LCD
 output wire LCD_RS, LCD_EN, LCD_RW, LCD_ON, LCD_BLON,
@@ -25,17 +26,15 @@ inout wire [7:0] LCD_DATA
 	
 	// Conexões Intermediárias: Sinais de Controle
 	wire [3:0] CTRLOpULA;
-	wire [2:0] CTRLDesvio, CTRLDadoImediato, CTRLEndMem, CTRLDadoReg, CTRLDadoCPSR, CTRLInstrucao;
+	wire [2:0] CTRLDesvio, CTRLDadoImediato, CTRLEndMem, CTRLDadoReg, CTRLDadoCPSR;
 	wire [1:0] CTRLEscritaIR;
 	wire CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLEscritaInstr, CTRLEscritaHD, CTRLEscritaBase, CTRLEscritaLCD, CTRLQuantum;
-	wire CTRLHalt, CTRLSaida, CTRLCLK, CTRLEntrada;
+	wire CTRLHalt, CTRLSaida, CTRLCLK;
 	
 	// Conexões Intermediárias: Clock
 	wire CLK, CLKManual;
 
 	localparam Zero = 32'd0, Um = 32'd1;
-	
-	assign LEDR = ChaveDado;
 	
 	PC PC	(	.CTRLHalt(CTRLHalt),
 				.CLK(CLK),
@@ -111,7 +110,7 @@ inout wire [7:0] LCD_DATA
 															
 	Entrada Entrada	(	.Chaves(ChaveDado),
 								.Dado(DadoEntrada),
-								.CTRLEntrada(CTRLEntrada)
+								.Segmentos(SegmentosEntrada)
 								);
 								
 	MUX MUX2	(	.Dado1(DadoRegLeitura2),
@@ -205,7 +204,6 @@ inout wire [7:0] LCD_DATA
 													.CTRLEscritaLCD(CTRLEscritaLCD),
 													.CTRLQuantum(CTRLQuantum),
 													.CTRLInstrucao(CTRLInstrucao),
-													.CTRLEntrada(CTRLEntrada),
 													.LEDIN(LEDIN),
 													.LEDOUT(LEDOUT)
 													);
