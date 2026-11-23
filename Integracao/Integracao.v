@@ -1,12 +1,13 @@
 module Integracao
 (
 // Entradas
-input wire [7:0] ChaveDado,
+input wire [15:0] ChaveDado,
 input wire CLKFPGA, ChaveClock, ChaveReset,
 
 // Saídas
-output wire [27:0] Segmentos, SegmentosEntrada,
+output wire [55:0] Segmentos,
 output wire LEDIN, LEDOUT,
+output wire [15:0] LEDR,
 
 output wire [2:0] CTRLInstrucao,
 
@@ -35,6 +36,8 @@ inout wire [7:0] LCD_DATA
 	wire CLK, CLKManual;
 
 	localparam Zero = 32'd0, Um = 32'd1;
+	
+	assign LEDR = ChaveDado;
 	
 	PC PC	(	.CTRLHalt(CTRLHalt),
 				.CLK(CLK),
@@ -109,8 +112,7 @@ inout wire [7:0] LCD_DATA
 															);
 															
 	Entrada Entrada	(	.Chaves(ChaveDado),
-								.Dado(DadoEntrada),
-								.Segmentos(SegmentosEntrada)
+								.Dado(DadoEntrada)
 								);
 								
 	MUX MUX2	(	.Dado1(DadoRegLeitura2),
