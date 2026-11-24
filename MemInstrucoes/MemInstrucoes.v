@@ -15,10 +15,10 @@ module MemInstrucoes
 	// Variáveis Auxiliares :: Memória RAM
 	reg [31:0] instr_ram[2047:0];
 
-	initial
-		begin
-		$readmemb("MemInstrDados.txt", instr_ram);
-		end
+//	initial
+//		begin
+//		$readmemb("MemInstrDados.txt", instr_ram);
+//		end
 
 	always @ (posedge CLKFPGA)
 		begin

@@ -40,7 +40,7 @@ output reg LEDIN, LEDOUT
 	
 	localparam	HLT  = 5'b00001, IN   = 5'b00010, OUT  = 5'b00011, RCPSR = 5'b00100, WCPSR = 5'b00101,
 					WLCD = 5'b00110, LDHD = 5'b00111, RIR0 = 5'b01000, RIR1  = 5'b01001, RIR2  = 5'b01010,
-					WB   = 5'b01011, QTM  = 5'b01100, SWB	= 7'b1101101, STHD = 5'b01110;
+					WB   = 5'b01011, QTM  = 5'b01100, SWB	= 5'b01101, STHD = 5'b01110;
 	
 	initial
 		begin
@@ -55,7 +55,7 @@ output reg LEDIN, LEDOUT
 			end
 		else
 			begin
-			if (Inibe == 1'b0 && Opcode[7:1] == SWB)
+			if (Inibe == 1'b0 && Opcode[7:1] == {2'b11, SWB})
 				begin
 				CTRLInstrucao <= 3'b001;
 				end
@@ -461,7 +461,23 @@ output reg LEDIN, LEDOUT
 												CTRLQuantum			<= 1'b0;
 												CTRLDesvio 			<= 3'b000;
 												end
-								default:	 	begin		// NOP e SWB
+									SWB:		begin
+												CTRLHalt 			<= 1'b0;
+												CTRLEscritaCPSR	<= 1'b0;
+												CTRLEscritaReg		<= 1'b0;
+												CTRLDadoReg			<= 3'b000;
+												CTRLSaida			<= 1'b0;
+												CTRLCLK				<= 1'b0;
+												CTRLDadoCPSR		<= 3'b000;
+												CTRLEscritaInstr	<= 1'b0;
+												CTRLEscritaHD		<= 1'b0;
+												CTRLEscritaIR		<= 2'b00;
+												CTRLEscritaBase	<= 1'b0;
+												CTRLEscritaLCD		<= 1'b0;
+												CTRLQuantum			<= 1'b0;
+												CTRLDesvio 			<= 3'b001;
+												end
+								default:	 	begin		// NOP
 												CTRLHalt 			<= 1'b0;
 												CTRLEscritaCPSR	<= 1'b0;
 												CTRLEscritaReg		<= 1'b0;
