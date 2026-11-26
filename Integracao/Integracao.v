@@ -9,8 +9,6 @@ output wire [55:0] Segmentos,
 output wire LEDIN, LEDOUT,
 output wire [15:0] LEDR,
 
-output wire [2:0] CTRLInstrucao,
-
 // Saídas :: LCD
 output wire LCD_RS, LCD_EN, LCD_RW, LCD_ON, LCD_BLON,
 inout wire [7:0] LCD_DATA
@@ -19,7 +17,7 @@ inout wire [7:0] LCD_DATA
 	// Conexões Intermediárias
 	wire [31:0] NovoEndereco, EnderecoAtual, ProximoEndereco, Instrucao, InstrMem, InstrBIOS, EndSelecionado, Imediato, FlagsNZCVEstendidas;
 	wire [31:0] DadoEntrada, DadoRegLeitura1, DadoRegLeitura2, DadoSelecionado, DadoMemoria, DadoRegEscrita, SaidaULA, DadoCPSREscrita, DadoHD;
-	wire [31:0] DadoLeituraIR0, DadoLeituraIR1, DadoLeituraIR2, DadoLeituraIR3, EnderecoBase, EndMD;
+	wire [31:0] DadoLeituraIR0, DadoLeituraIR1, DadoLeituraIR2, DadoLeituraIR3, EnderecoBase, EndMD, EnderecoSAP;
 	wire [7:0] Opcode;
 	wire [4:0] RN, RM, RD;
 	wire [3:0] Cond, NovasFlags, FlagsNZCV;
@@ -27,9 +25,9 @@ inout wire [7:0] LCD_DATA
 	
 	// Conexões Intermediárias: Sinais de Controle
 	wire [3:0] CTRLOpULA;
-	wire [2:0] CTRLDesvio, CTRLDadoImediato, CTRLEndMem, CTRLDadoReg, CTRLDadoCPSR;
-	wire [1:0] CTRLEscritaIR;
-	wire CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLEscritaInstr, CTRLEscritaHD, CTRLEscritaBase, CTRLEscritaLCD, CTRLQuantum;
+	wire [2:0] CTRLDesvio, CTRLDadoImediato, CTRLEndMem, CTRLDadoReg, CTRLDadoCPSR, CTRLInstrucao;
+	wire [2:0] CTRLEscritaIR;
+	wire CTRLEscritaReg, CTRLEscritaCPSR, CTRLEscritaMem, CTRLEscritaInstr, CTRLEscritaHD, CTRLEscritaBase, CTRLEscritaLCD, CTRLQuantum, CTRLEscritaSAP;
 	wire CTRLHalt, CTRLSaida, CTRLCLK;
 	
 	// Conexões Intermediárias: Clock
@@ -39,47 +37,47 @@ inout wire [7:0] LCD_DATA
 	
 	assign LEDR = ChaveDado;
 	
-	PC PC	(	.CTRLHalt(CTRLHalt),
-				.CLK(CLK),
-				.Reset(ChaveReset),
-				.NovoEndereco(NovoEndereco),
-				.EnderecoAtual(EnderecoAtual),
-				.EnderecoInterrupcao(DadoLeituraIR2),
-				.Interrupcao(Interrupcao)
+	PC pc_u0	(	.CTRLHalt(CTRLHalt),
+					.CLK(CLK),
+					.Reset(ChaveReset),
+					.NovoEndereco(NovoEndereco),
+					.EnderecoAtual(EnderecoAtual),
+					.EnderecoInterrupcao(DadoLeituraIR2),
+					.Interrupcao(Interrupcao)
 				);
 			
-	Adder ADD	(	.Dado1(EnderecoAtual),
-						.Dado2(Um),
-						.Soma(ProximoEndereco)
+	Adder add_u0	(	.Dado1(EnderecoAtual),
+							.Dado2(Um),
+							.Soma(ProximoEndereco)
 						);		
 						
 	MUX MUX1	(	.Dado1(ProximoEndereco),
 					.Dado2(Imediato),
 					.Dado3(DadoRegLeitura1),
-					.Dado4(Zero),
-					.Dado5(Zero),
-					.Dado6(Zero),
+					.Dado4(EnderecoSAP),
+					.Dado5(Zero),				// IR1
+					.Dado6(Zero),				// IR2
 					.Dado7(Zero),
 					.Dado8(Zero),
 					.Selecao(CTRLDesvio),
 					.DadoSaida(NovoEndereco)
-					);
+				);
 					
-	MemInstrucoes MemInstrucoes	(	.EnderecoAtual(EnderecoAtual), 
-												.EnderecoEscrita(DadoRegLeitura1),
-												.DadoEscrita(DadoHD),
-												.CTRLEscritaInstr(CTRLEscritaInstr),
-												.CLK(CLK),
-												.CLKFPGA(CLKFPGA), 
-												.Instrucao(InstrMem)
-												);	
+	MemInstrucoes mem_instr_u0	(	.EnderecoAtual(EnderecoAtual), 
+											.EnderecoEscrita(DadoRegLeitura1),
+											.DadoEscrita(DadoHD),
+											.CTRLEscritaInstr(CTRLEscritaInstr),
+											.CLK(CLK),
+											.CLKFPGA(CLKFPGA), 
+											.Instrucao(InstrMem)
+										);	
 	
-	BIOS BIOS (	.clock_leitura(CLKFPGA),
-					.endereco(EnderecoAtual),
-					.instrucao(InstrBIOS)
-					);
+	BIOS bios_u0	(	.clock_leitura(CLKFPGA),
+							.endereco(EnderecoAtual),
+							.instrucao(InstrBIOS)
+						);
 					
-	MUX MUX6 (	.Dado1(InstrBIOS),
+	MUX MUX6	(	.Dado1(InstrBIOS),
 					.Dado2(InstrMem),
 					.Dado3(Zero),
 					.Dado4(Zero),
@@ -89,30 +87,30 @@ inout wire [7:0] LCD_DATA
 					.Dado8(Zero),
 					.Selecao(CTRLInstrucao),
 					.DadoSaida(Instrucao)
-					);
+				);
 												
-	UnidadeDecodificacao UnidadeDecodificacao	(	.Instrucao(Instrucao),
-																.Cond(Cond),
-																.Opcode(Opcode),
-																.RN(RN),
-																.RM(RM),
-																.RD(RD),
-																.Imediato(Imediato)
-																);
+	UnidadeDecodificacao udecod_u0	(	.Instrucao(Instrucao),
+													.Cond(Cond),
+													.Opcode(Opcode),
+													.RN(RN),
+													.RM(RM),
+													.RD(RD),
+													.Imediato(Imediato)
+												);
 																
-	BancoRegistradores BancoRegistradores	(	.RN(RN),
-															.RM(RM),
-															.RD(RD),
-															.DadoRegEscrita(DadoRegEscrita),	
-															.CTRLEscritaReg(CTRLEscritaReg),
-															.CLK(CLK),
-															.CLKFPGA(CLKFPGA),
-															.DadoRegLeitura1(DadoRegLeitura1),
-															.DadoRegLeitura2(DadoRegLeitura2)
-															);
+	BancoRegistradores breg_u0	(	.RN(RN),
+											.RM(RM),
+											.RD(RD),
+											.DadoRegEscrita(DadoRegEscrita),	
+											.CTRLEscritaReg(CTRLEscritaReg),
+											.CLK(CLK),
+											.CLKFPGA(CLKFPGA),
+											.DadoRegLeitura1(DadoRegLeitura1),
+											.DadoRegLeitura2(DadoRegLeitura2)
+										);
 															
-	Entrada Entrada	(	.Chaves(ChaveDado),
-								.Dado(DadoEntrada)
+	Entrada entrada_u0	(	.Chaves(ChaveDado),
+									.Dado(DadoEntrada)
 								);
 								
 	MUX MUX2	(	.Dado1(DadoRegLeitura2),
@@ -125,24 +123,24 @@ inout wire [7:0] LCD_DATA
 					.Dado8(Zero),
 					.Selecao(CTRLDadoImediato),
 					.DadoSaida(DadoSelecionado)
-					);	
+				);	
 					
-	Saida Saida	(	.DadoEntrada(DadoRegLeitura1),
-						.CTRLSaida(CTRLSaida),
-						.Segmentos(Segmentos)
+	Saida saida_u0	(	.DadoEntrada(DadoRegLeitura1),
+							.CTRLSaida(CTRLSaida),
+							.Segmentos(Segmentos)
 						);
 						
-	ULA ULA	(	.Dado1(DadoRegLeitura1),
-					.Dado2(DadoSelecionado),
-					.CTRLOpULA(CTRLOpULA),
-					.SaidaULA(SaidaULA),
-					.NovasFlags(NovasFlags)
+	ULA ula_u0	(	.Dado1(DadoRegLeitura1),
+						.Dado2(DadoSelecionado),
+						.CTRLOpULA(CTRLOpULA),
+						.SaidaULA(SaidaULA),
+						.NovasFlags(NovasFlags)
 					);
 	
-	CPSR CPSR	(	.NovasFlags(DadoCPSREscrita),
-						.CTRLEscritaCPSR(CTRLEscritaCPSR),
-						.CLK(CLK),
-						.FlagsNZCV(FlagsNZCV)
+	CPSR cpsr_u0	(	.NovasFlags(DadoCPSREscrita),
+							.CTRLEscritaCPSR(CTRLEscritaCPSR),
+							.CLK(CLK),
+							.FlagsNZCV(FlagsNZCV)
 						);
 	
 	MUX MUX3	(	.Dado1(Imediato),
@@ -155,16 +153,16 @@ inout wire [7:0] LCD_DATA
 					.Dado8(Zero),
 					.Selecao(CTRLEndMem),
 					.DadoSaida(EndSelecionado)
-					);
+				);
 				
-	MemPrincipal MemPrincipal	(	.EndLeitura(EndMD),
+	MemPrincipal mem_dados_u0	(	.EndLeitura(EndMD),
 											.EndEscrita(EndMD),
 											.DadoMemEscrita(DadoRegLeitura2),
 											.CTRLEscritaMem(CTRLEscritaMem),
 											.CLK(CLK),
 											.CLKFPGA(CLKFPGA),
 											.DadoMemoria(DadoMemoria)
-											);
+										);
 										
 	MUX MUX4	(	.Dado1(DadoMemoria),
 					.Dado2(SaidaULA),
@@ -176,54 +174,55 @@ inout wire [7:0] LCD_DATA
 					.Dado8(DadoLeituraIR2),
 					.Selecao(CTRLDadoReg),
 					.DadoSaida(DadoRegEscrita)
-					);
+				);
 				
-	UnidadeValidacao UnidadeValidacao	(	.Cond(Cond),
-														.FlagsNZCV(FlagsNZCV),
-														.Inibe(Inibe)
-														);
+	UnidadeValidacao uval_u0	(	.Cond(Cond),
+											.FlagsNZCV(FlagsNZCV),
+											.Inibe(Inibe)
+										);
 	
-	UnidadeControle UnidadeControle	(	.Opcode(Opcode),
-													.Inibe(Inibe),
-													.ChaveReset(ChaveReset),
-													.CLK(CLK),
-													.CTRLDesvio(CTRLDesvio),
-													.CTRLDadoImediato(CTRLDadoImediato),
-													.CTRLEndMem(CTRLEndMem),
-													.CTRLDadoReg(CTRLDadoReg),
-													.CTRLEscritaReg(CTRLEscritaReg),
-													.CTRLEscritaCPSR(CTRLEscritaCPSR),
-													.CTRLEscritaMem(CTRLEscritaMem),
-													.CTRLOpULA(CTRLOpULA),
-													.CTRLHalt(CTRLHalt),
-													.CTRLSaida(CTRLSaida),
-													.CTRLCLK(CTRLCLK),
-													.CTRLDadoCPSR(CTRLDadoCPSR),
-													.CTRLEscritaInstr(CTRLEscritaInstr),
-													.CTRLEscritaHD(CTRLEscritaHD),
-													.CTRLEscritaIR(CTRLEscritaIR),
-													.CTRLEscritaBase(CTRLEscritaBase),
-													.CTRLEscritaLCD(CTRLEscritaLCD),
-													.CTRLQuantum(CTRLQuantum),
-													.CTRLInstrucao(CTRLInstrucao),
-													.LEDIN(LEDIN),
-													.LEDOUT(LEDOUT)
-													);
+	UnidadeControle ucontrol_u0	(	.Opcode(Opcode),
+												.Inibe(Inibe),
+												.ChaveReset(ChaveReset),
+												.CLK(CLK),
+												.CTRLDesvio(CTRLDesvio),
+												.CTRLDadoImediato(CTRLDadoImediato),
+												.CTRLEndMem(CTRLEndMem),
+												.CTRLDadoReg(CTRLDadoReg),
+												.CTRLEscritaReg(CTRLEscritaReg),
+												.CTRLEscritaCPSR(CTRLEscritaCPSR),
+												.CTRLEscritaMem(CTRLEscritaMem),
+												.CTRLOpULA(CTRLOpULA),
+												.CTRLHalt(CTRLHalt),
+												.CTRLSaida(CTRLSaida),
+												.CTRLCLK(CTRLCLK),
+												.CTRLDadoCPSR(CTRLDadoCPSR),
+												.CTRLEscritaInstr(CTRLEscritaInstr),
+												.CTRLEscritaHD(CTRLEscritaHD),
+												.CTRLEscritaIR(CTRLEscritaIR),
+												.CTRLEscritaBase(CTRLEscritaBase),
+												.CTRLEscritaLCD(CTRLEscritaLCD),
+												.CTRLQuantum(CTRLQuantum),
+												.CTRLInstrucao(CTRLInstrucao),
+												.CTRLEscritaSAP(CTRLEscritaSAP),
+												.LEDIN(LEDIN),
+												.LEDOUT(LEDOUT)
+											);
 												
-	SeletorClock SeletorClock	(	.CLKFPGA(CLKFPGA),
+	SeletorClock selclock_u0	(	.CLKFPGA(CLKFPGA),
 											.CLKManual(CLKManual),
 											.CTRLCLK(CTRLCLK),
 											.CLK(CLK)
-											);
+										);
 	
-	Debounce Debounce	(	.CLKFPGA(CLKFPGA),
-								.ChaveClock(ChaveClock),
-								.CLKManual(CLKManual)
+	Debounce debounce_u0	(	.CLKFPGA(CLKFPGA),
+									.ChaveClock(ChaveClock),
+									.CLKManual(CLKManual)
 								);
 	
-	EstensorSinal EstensorSinal (	.FlagsNZCV(FlagsNZCV),
+	EstensorSinal estsinal_u0	(	.FlagsNZCV(FlagsNZCV),
 											.FlagsNZCVEstendidas(FlagsNZCVEstendidas)
-											);
+										);
 	
 	MUX MUX5 (	.Dado1(NovasFlags),
 					.Dado2(DadoRegLeitura1),
@@ -237,58 +236,65 @@ inout wire [7:0] LCD_DATA
 					.DadoSaida(DadoCPSREscrita)
 				);
 	
-	DiscoRigido DiscoRigido (	.EndLeitura(DadoRegLeitura2),
-										.EndEscrita(DadoRegLeitura2),
-										.DadoEscrita(DadoRegLeitura1),
-										.CTRLEscritaHD(CTRLEscritaHD),
-										.CLKFPGA(CLKFPGA),
-										.CLK(CLK),
-										.DadoHD(DadoHD)
-									);
+	DiscoRigido hd_u0		(	.EndLeitura(DadoRegLeitura2),
+									.EndEscrita(DadoRegLeitura2),
+									.DadoEscrita(DadoRegLeitura1),
+									.CTRLEscritaHD(CTRLEscritaHD),
+									.CLKFPGA(CLKFPGA),
+									.CLK(CLK),
+									.DadoHD(DadoHD)
+								);
 	
-	BancoRegInterrupcoes BancoRegInterrupcoes (	.DadoEscritaIR1(NovoEndereco),
-																.DadoEscritaIR2(ProximoEndereco),
-																.CTRLEscritaIR(CTRLEscritaIR),
-																.CLKFPGA(CLKFPGA),
-																.CLK(CLK),
-																.Interrupcao(Interrupcao),
-																.Reset(ChaveReset),
-																.DadoLeituraIR0(DadoLeituraIR0),
-																.DadoLeituraIR1(DadoLeituraIR1),
-																.DadoLeituraIR2(DadoLeituraIR2),
-																.DadoLeituraIR3(DadoLeituraIR3)
-															);
+	BancoRegInterrupcoes breg_interr_u0	(	.DadoEscritaIR1(NovoEndereco),
+														.DadoEscritaIR2(ProximoEndereco),
+														.CTRLEscritaIR(CTRLEscritaIR),
+														.CLKFPGA(CLKFPGA),
+														.CLK(CLK),
+														.Interrupcao(Interrupcao),
+														.Reset(ChaveReset),
+														.DadoLeituraIR0(DadoLeituraIR0),
+														.DadoLeituraIR1(DadoLeituraIR1),
+														.DadoLeituraIR2(DadoLeituraIR2),
+														.DadoLeituraIR3(DadoLeituraIR3)
+													);
 	
-	Base Base ( .NovaBase(DadoRegLeitura1),
-					.CTRLEscritaBase(CTRLEscritaBase),
-					.CLK(CLK),
-					.EnderecoBase(EnderecoBase)
-					);
+	Base base_u0	(	.NovaBase(DadoRegLeitura1),
+							.CTRLEscritaBase(CTRLEscritaBase),
+							.CLK(CLK),
+							.EnderecoBase(EnderecoBase)
+						);
 	
-	Adder ADD2 (	.Dado1(EnderecoBase),
-						.Dado2(EndSelecionado),
-						.Soma(EndMD)
-					);
+	Adder add_u1	(	.Dado1(EnderecoBase),
+							.Dado2(EndSelecionado),
+							.Soma(EndMD)
+						);
 					
-	LCD LCD (	.CLOCK_50(CLKFPGA),
-					.write_clock(CLK),
-					.write_lcd(CTRLEscritaLCD),
-					.lcd_addr(Imediato),
-					.lcd_data(DadoRegLeitura1),
-					.LCD_ON(LCD_ON),
-					.LCD_BLON(LCD_BLON),
-					.LCD_RW(LCD_RW),
-					.LCD_EN(LCD_EN),
-					.LCD_RS(LCD_RS),
-					.LCD_DATA(LCD_DATA)
-	);
+	LCD lcd_u0	(	.CLOCK_50(CLKFPGA),
+						.write_clock(CLK),
+						.write_lcd(CTRLEscritaLCD),
+						.lcd_addr(Imediato),
+						.lcd_data(DadoRegLeitura1),
+						.LCD_ON(LCD_ON),
+						.LCD_BLON(LCD_BLON),
+						.LCD_RW(LCD_RW),
+						.LCD_EN(LCD_EN),
+						.LCD_RS(LCD_RS),
+						.LCD_DATA(LCD_DATA)
+					);
 	
-	Temporizador Temporizador (	.clock_processador(CLK),
-											.reset(ChaveReset),
-											.escreve_quantum(CTRLQuantum),
-											.habilita_interrupcao(DadoLeituraIR3),
-											.novo_quantum(DadoRegLeitura1),
-											.interrupcao(Interrupcao)
-										);
+	Temporizador temporizador_u0	(	.clock_processador(CLK),
+												.reset(ChaveReset),
+												.escreve_quantum(CTRLQuantum),
+												.habilita_interrupcao(DadoLeituraIR3),
+												.novo_quantum(DadoRegLeitura1),
+												.interrupcao(Interrupcao)
+											);
+	
+	SAP sap_u0	(	.novo_endereco(DadoRegLeitura1),
+						.clock_processador(CLK),
+						.clock_leitura(CLKFPGA),
+						.escreve_endereco(CTRLEscritaSAP),
+						.endereco(EnderecoSAP)
+					);
 
 endmodule 

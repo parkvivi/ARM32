@@ -9,7 +9,7 @@ output reg [31:0] Dado
 
 	always @ (*)
 		begin
-		Dado <= {24'b0, Chaves[15:0]};
+		Dado <= {16'b0, Chaves[15:0]};
 		end
 
 endmodule 
